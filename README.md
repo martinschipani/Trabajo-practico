@@ -25,7 +25,6 @@ El programa solicita desde el teclado un valor de Operando inicial con el mismo 
 
 ## Ejemplo de Ejecución
 
-```plaintext
 Operando Inicial = 0000000000000101
 Operando Registro 1 = 1111111111111111
 Operación Registro 1 = X (Xor)
