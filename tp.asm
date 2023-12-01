@@ -16,6 +16,7 @@ section .data
     formatoChar db "%c", 10, 0
     formatoByte db "%hhi", 10, 0
     string db "110001111111111", 0
+    char db '1', 0
     
 section .bss
     bufferRegistro times 0 resb 17
@@ -33,18 +34,6 @@ section .text
     ;sub rsp, 8
     ;call ingresarOperando
     ;add rsp, 8
-
-    mov rdi, string
-    sub rsp, 8
-    call validarOperando
-    add rsp, 8
-
-    mov rdi, formatoChar
-    mov sil, byte[valido]
-    sub rsp, 8
-    call printf
-    add rsp, 8
-
     ;sub rsp, 8
     ;call abrirArchivo
     ;add rsp, 8
@@ -55,7 +44,6 @@ section .text
     ;add rsp, 8
     ;cmp rax, 0
     ;jle eof
-    ;
     ;eof:
     ;sub rsp, 8
     ;call cerrarArchivo
@@ -165,4 +153,18 @@ jmp finValidarCaracterBinario
 carcaterBinarioValido:
 mov byte[valido], 'S'
 finValidarCaracterBinario:
+ret
+
+validarOperacion:;rdi: operacion
+mov byte[valido], 'N'
+cmp byte[rdi], 'O'
+je operacionValida
+cmp byte[rdi], 'X'
+je operacionValida
+cmp byte[rdi], 'N'
+je operacionValida
+jmp finvalidarOperacion
+operacionValida:
+mov byte[valido], 'S'
+finvalidarOperacion:
 ret
