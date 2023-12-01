@@ -41,11 +41,6 @@ Equipo compatible: El programa está diseñado para sistemas basados en arquitec
 
 ## Instrucciones de Compilación y Ejecución
 
-Clona el repositorio:
-
-git clone https://github.com/tu-usuario/tu-repositorio.git
-cd tu-repositorio
-
 
 Compila el programa:
 
