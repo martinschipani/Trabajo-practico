@@ -4,6 +4,7 @@ extern printf
 extern fread
 extern fclose
 extern gets
+extern sscanf
 extern puts
 
 section .data
@@ -14,14 +15,17 @@ section .data
     msgOperando db "Operando inicial (16 caracteres): ", 0
     formatoChar db "%c", 10, 0
     formatoOperacionLogica db "%s", 10, "%s", 10, "%s", 10, 0
+    formatoResultado db "%s", 10, "%s", 10, 10, 0
     disyuncion db "OR", 0
     exclusiva db "XOR", 0
     conjuncion db "AND", 0
+    linea db "----------------", 0
     ;variables de testeo
-    formatoQword db "%li", 10, 0
-    formatoByte db "%hhi", 10, 0
-    string db "110001111111111", 0
+    formatoQword db "%li", 0
+    formatoByte db "%hhi", 0
+    string db "0123456789", 0
     char db '1', 0
+    bit db 1
     
 section .bss
     bufferRegistro times 0 resb 17
@@ -33,6 +37,8 @@ section .bss
     operandoInicial resq 2
     valido resb 1
     nombreOperacion resb 3
+    bitA resb 1
+    bitB resb 1
     ;variables de testeo
     caracter resb 1
 
@@ -46,6 +52,7 @@ section .text
     add rsp, 8
     cmp rax, 0
     jle finPrograma
+    siguienteRegistro:
     sub rsp, 8
     call leerRegistro
     add rsp, 8
@@ -54,10 +61,13 @@ section .text
     sub rsp, 8 
     call mostrarOperacionLogica
     add rsp, 8
-
-    
-
-
+    sub rsp, 8
+    call calcular
+    add rsp, 8
+    sub rsp, 8
+    call mostrarResultado
+    add rsp, 8
+    jmp siguienteRegistro
     eof:
     sub rsp, 8
     call cerrarArchivo
@@ -195,9 +205,19 @@ sub rsp, 8
 call asignarNombreOperacion
 add rsp, 8
 mov rdi, formatoOperacionLogica
+mov sil, byte[operacion]
 mov rsi, nombreOperacion
 mov rdx, operandoInicial
 mov rcx, operando
+sub rsp, 8
+call printf
+add rsp, 8
+ret
+
+mostrarResultado:
+mov rdi, formatoResultado
+mov rsi, linea
+mov rdx, operandoInicial
 sub rsp, 8
 call printf
 add rsp, 8
@@ -208,12 +228,59 @@ cmp byte[operacion], 'O'
 je or
 cmp byte[operacion], 'X'
 je xor
+jmp and
 or:
 mov rsi, disyuncion
+mov rdi, nombreOperacion
+mov rcx, 3
+rep movsb
 jmp finAsignarNombreOperacion
 xor:
 mov rsi, exclusiva
+mov rdi, nombreOperacion
+mov rcx, 3
+rep movsb
 jmp finAsignarNombreOperacion
+and:
 mov rsi, conjuncion
+mov rdi, nombreOperacion
+mov rcx, 3
+rep movsb
 finAsignarNombreOperacion:
 ret
+
+calcular:
+mov rcx, 15
+;Cambio el caracter a numero
+siguienteBit:
+mov r8b, byte[operandoInicial + rcx]
+sub r8b, '0'
+mov r9b, byte[operando + rcx]
+sub r9b, '0'
+cmp byte[operacion], 'O'
+je calculoOr
+cmp byte[operacion], 'X'
+je calculoXor
+;calculoAnd
+and r8b, r9b
+jmp convierteACaracter
+calculoXor:
+xor r8b, r9b
+jmp convierteACaracter
+calculoOr:
+or r8b, r9b
+jmp convierteACaracter
+;Cambio el numero a caracter
+convierteACaracter:
+add r8b, '0'
+mov byte[operandoInicial + rcx], r8b
+dec rcx
+cmp rcx, 0
+jge siguienteBit
+ret
+
+
+
+
+
+
