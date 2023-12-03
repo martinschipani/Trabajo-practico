@@ -5,7 +5,6 @@ extern fread
 extern fclose
 extern gets
 extern sscanf
-extern puts
 
 section .data
     rutaArchivo db "prueba.dat", 0
@@ -20,12 +19,6 @@ section .data
     exclusiva db "XOR", 0
     conjuncion db "AND", 0
     linea db "----------------", 0
-    ;variables de testeo
-    formatoQword db "%li", 0
-    formatoByte db "%hhi", 0
-    string db "0123456789", 0
-    char db '1', 0
-    bit db 1
     
 section .bss
     bufferRegistro times 0 resb 17
@@ -39,8 +32,6 @@ section .bss
     nombreOperacion resb 3
     bitA resb 1
     bitB resb 1
-    ;variables de testeo
-    caracter resb 1
 
 section .text
     main:
