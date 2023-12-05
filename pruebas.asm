@@ -7,7 +7,7 @@ extern gets
 extern sscanf
 
 section .data
-    rutaArchivo db "prueba.dat", 0
+    rutaArchivo db "7503-TP-09-100629.dat", 0
     modoLectura db "rb", 0
     formatoString db "%s", 0
     msgErrorApertura db "No se encuentra el archivo", 10, 0
@@ -27,7 +27,7 @@ section .bss
     idArchivo resq 1
     operando resq 2
     bufferOperandoInicial resq 2
-    operandoInicial resq 2
+    operandoInicial resb 17
     valido resb 1
     nombreOperacion resb 3
     bitA resb 1
@@ -49,6 +49,13 @@ section .text
     add rsp, 8
     cmp rax, 0
     jle eof
+    sub rsp, 8
+    call validarRegistro
+    add rsp, 8
+    cmp r8b, 'N'
+    je siguienteRegistro
+    cmp byte[valido], 'N'
+    je siguienteRegistro
     sub rsp, 8 
     call mostrarOperacionLogica
     add rsp, 8
@@ -177,18 +184,29 @@ mov byte[valido], 'S'
 finValidarCaracterBinario:
 ret
 
-validarOperacion:;rdi: operacion
+validarOperacion:
 mov byte[valido], 'N'
-cmp byte[rdi], 'O'
+cmp byte[operacion], 'O'
 je operacionValida
-cmp byte[rdi], 'X'
+cmp byte[operacion], 'X'
 je operacionValida
-cmp byte[rdi], 'N'
+cmp byte[operacion], 'N'
 je operacionValida
 jmp finvalidarOperacion
 operacionValida:
 mov byte[valido], 'S'
 finvalidarOperacion:
+ret
+
+validarRegistro:
+mov rdi, operando
+sub rsp, 8
+call validarOperando
+add rsp, 8
+mov r8b, byte[valido]
+sub rsp, 8
+call validarOperacion
+add rsp, 8
 ret
 
 mostrarOperacionLogica:
